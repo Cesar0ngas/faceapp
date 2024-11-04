@@ -10,7 +10,7 @@ from mtcnn import MTCNN
 # Ruta del modelo en Google Cloud Storage y donde se guardará localmente
 MODEL_URL = "https://storage.googleapis.com/facenet_keras/facenet_keras.h5"
 LOCAL_MODEL_PATH = "models/facenet_keras.h5"
-EXPECTED_MD5 = "d4169b76ead0a7a58c5ba7ca4c0b505b"
+EXPECTED_MD5 = "d4169b76ead0a7a58c5ba7ca4c0b505b"  # Hash MD5 del modelo esperado
 
 # Verificar la integridad del archivo descargado
 def verify_md5(file_path, expected_md5):
@@ -25,10 +25,13 @@ def download_model():
     if not os.path.exists(LOCAL_MODEL_PATH):
         print("Descargando el modelo...")
         response = requests.get(MODEL_URL, stream=True)
-        with open(LOCAL_MODEL_PATH, "wb") as file:
-            for chunk in response.iter_content(chunk_size=8192):
-                file.write(chunk)
-        print("Modelo descargado exitosamente.")
+        if response.status_code == 200:
+            with open(LOCAL_MODEL_PATH, "wb") as file:
+                for chunk in response.iter_content(chunk_size=8192):
+                    file.write(chunk)
+            print("Modelo descargado exitosamente.")
+        else:
+            raise Exception("Error al descargar el modelo.")
 
     # Verificar la integridad del archivo descargado
     if not verify_md5(LOCAL_MODEL_PATH, EXPECTED_MD5):
