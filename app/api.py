@@ -1,7 +1,8 @@
 import os
 import requests
 from flask import Flask, request, jsonify
-from scripts import recognize_person, extract_face
+from scripts.face_recognition import recognize_person
+from scripts.utils.detectar import extract_face
 
 app = Flask(__name__)
 
