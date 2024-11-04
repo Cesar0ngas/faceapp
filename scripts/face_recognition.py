@@ -1,37 +1,46 @@
 import os
+import requests
 import cv2
 import numpy as np
 from tensorflow.keras.models import load_model
 from mtcnn import MTCNN
 import pickle
 
-# Obtener la ruta absoluta para el modelo FaceNet y los archivos del clasificador y codificador
-base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))  # Ruta del directorio raíz del proyecto
-model_path = os.path.join(base_dir, 'models', 'facenet_keras.h5')
-classifier_path = os.path.join(base_dir, 'models', 'svm_classifier.pkl')
-encoder_path = os.path.join(base_dir, 'models', 'label_encoder.pkl')
+# Configuración de la URL y la ruta local del modelo
+MODEL_URL = "https://storage.googleapis.com/facenet_keras/facenet_keras.h5"
+LOCAL_MODEL_PATH = "models/facenet_keras.h5"
 
-# Verificar que todos los archivos existen
-if not os.path.exists(model_path):
-    raise FileNotFoundError(f"El archivo de modelo no se encontró en la ruta: {model_path}")
-if not os.path.exists(classifier_path):
-    raise FileNotFoundError(f"El archivo del clasificador no se encontró en la ruta: {classifier_path}")
-if not os.path.exists(encoder_path):
-    raise FileNotFoundError(f"El archivo del codificador no se encontró en la ruta: {encoder_path}")
+def download_model():
+    """Descarga el modelo desde Google Cloud Storage si no existe localmente."""
+    if not os.path.exists(LOCAL_MODEL_PATH):
+        os.makedirs(os.path.dirname(LOCAL_MODEL_PATH), exist_ok=True)
+        print("Descargando el modelo...")
+        response = requests.get(MODEL_URL, stream=True)
+        if response.status_code == 200:
+            with open(LOCAL_MODEL_PATH, "wb") as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    f.write(chunk)
+            print("Modelo descargado exitosamente.")
+        else:
+            raise Exception(f"Error al descargar el modelo: {response.status_code}")
+    else:
+        print("El modelo ya existe localmente.")
 
-# Cargar el modelo FaceNet, el clasificador y el codificador
-model = load_model(model_path)
-print("Modelo FaceNet cargado exitosamente.")
-with open(classifier_path, 'rb') as f:
+# Llamamos a download_model antes de cargar el modelo
+download_model()
+model = load_model(LOCAL_MODEL_PATH)
+
+# Cargar el clasificador y el codificador desde la carpeta `models`
+with open('models/svm_classifier.pkl', 'rb') as f:
     classifier = pickle.load(f)
-with open(encoder_path, 'rb') as f:
+with open('models/label_encoder.pkl', 'rb') as f:
     encoder = pickle.load(f)
 
-# Inicializar el detector de rostros MTCNN
+# Configuración del detector MTCNN
 detector = MTCNN()
 
-# Función para obtener el embedding de un rostro
 def get_embedding(face_pixels):
+    """Obtiene el embedding de un rostro dado."""
     face_pixels = face_pixels.astype('float32')
     mean, std = face_pixels.mean(), face_pixels.std()
     face_pixels = (face_pixels - mean) / std
@@ -39,10 +48,10 @@ def get_embedding(face_pixels):
     yhat = model.predict(samples)
     return yhat[0]
 
-# Función para reconocer a la persona en un frame de video o imagen
 def recognize_person(frame):
+    """Reconoce la persona en una imagen capturada."""
     results = detector.detect_faces(frame)
-    if results:  # Si hay al menos un rostro detectado
+    if results:
         for result in results:
             x1, y1, width, height = result['box']
             x1, y1 = abs(x1), abs(y1)
