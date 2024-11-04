@@ -1,7 +1,8 @@
 import os
 import requests
 from flask import Flask, request, jsonify
-from scripts import recognize_person, extract_face
+from scripts.face_recognition import recognize_person  # Importa la función de reconocimiento
+from scripts.utils.detectar import extract_face  # Asegúrate de que 'extract_face' esté definido en utils/detectar.py
 
 app = Flask(__name__)
 
@@ -34,12 +35,13 @@ def predict():
         return jsonify({'error': 'No se proporcionó la imagen.'}), 400
 
     file = request.files['image']
-    # Procesar la imagen y usar la función de reconocimiento
-    # Por ejemplo, convertir a un formato adecuado y pasar a la función `recognize_person`
-    image = extract_face(file)  # Aquí puedes usar una función para procesar la imagen
-    name, probability = recognize_person(image)
+    # Aquí deberías procesar la imagen y usar la función de reconocimiento
+    # (Por ejemplo, convertir a un formato adecuado y pasar a la función `recognize_person`)
 
-    return jsonify({"name": name, "probability": probability})
+    # Simulando un resultado para la demostración
+    result = {"name": "Simulated Name", "probability": 95.0}
+    
+    return jsonify(result)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
