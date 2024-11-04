@@ -1,8 +1,8 @@
 import os
 import requests
 from flask import Flask, request, jsonify
-from scripts.face_recognition import recognize_person  # Importa la función de reconocimiento
-from utils.detectar import detector  # Asegúrate de que 'Detector' esté definido en utils/detector.py
+from scripts.face_recognition import recognize_person  
+from scripts.utils.detectar import detector
 
 app = Flask(__name__)
 
