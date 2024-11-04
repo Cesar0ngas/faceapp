@@ -17,8 +17,8 @@ db = client.AttendanceDB
 students_collection = db.students
 attendance_collection = db.attendance
 
-API_URL = "http://localhost:5000/predict"  # URL for the recognition API
-RETRAIN_URL = "http://localhost:5000/retrain"  # URL to trigger retraining
+API_URL = "https://faceappz.onrender.com/predict" 
+RETRAIN_URL = "https://faceappz.onrender.com/retrain"  
 
 DATASET_PATH = "./dataset/train/"  # Path to save student images for training
 
