@@ -10,7 +10,7 @@ from mtcnn import MTCNN
 # Ruta del modelo en Google Cloud Storage y donde se guardará localmente
 MODEL_URL = "https://storage.googleapis.com/facenet_keras/facenet_keras.h5"
 LOCAL_MODEL_PATH = "models/facenet_keras.h5"
-EXPECTED_MD5 = "d4169b76ead0a7a58c5ba7ca4c0b505b"  # Hash MD5 obtenido previamente
+EXPECTED_MD5 = "d4169b76ead0a7a58c5ba7ca4c0b505b"
 
 # Verificar la integridad del archivo descargado
 def verify_md5(file_path, expected_md5):
