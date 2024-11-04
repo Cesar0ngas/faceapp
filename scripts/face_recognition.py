@@ -42,14 +42,20 @@ def download_model():
 download_model()
 
 # Cargar el modelo FaceNet
-model = load_model(LOCAL_MODEL_PATH)
-print("Modelo FaceNet cargado exitosamente.")
+try:
+    model = load_model(LOCAL_MODEL_PATH)
+    print("Modelo FaceNet cargado exitosamente.")
+except Exception as e:
+    print(f"Error al cargar el modelo: {e}")
 
 # Cargar el clasificador SVM y el codificador de etiquetas
-with open("models/svm_classifier.pkl", "rb") as f:
-    classifier = pickle.load(f)
-with open("models/label_encoder.pkl", "rb") as f:
-    encoder = pickle.load(f)
+try:
+    with open("models/svm_classifier.pkl", "rb") as f:
+        classifier = pickle.load(f)
+    with open("models/label_encoder.pkl", "rb") as f:
+        encoder = pickle.load(f)
+except Exception as e:
+    print(f"Error al cargar el clasificador o el codificador: {e}")
 
 # Inicializar el detector de rostros MTCNN
 detector = MTCNN()
